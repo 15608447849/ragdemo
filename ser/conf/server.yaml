@@ -6,24 +6,24 @@ api:
 mysql:
   database: 'mrag'
   user: 'root'
-  password: 'infini_rag_flow'
-  host: 'localhost'
-  port: 5455
+  password: '000000'
+  host: '192.168.1.110'
+  port: 3306
 
 minio:
-  user: 'rag_flow'
-  password: 'infini_rag_flow'
-  host: 'localhost:9000'
+  user: 'minio'
+  password: 'minio000000'
+  host: '192.168.1.110:19000'
   bucket: 'mrag'
 
 redis:
   db: 1
-  password: 'infini_rag_flow'
-  host: 'localhost'
+  password: 'redis'
+  host: '192.168.1.110'
   port: 6379
 
 elasticsearch:
-  host: 'http://localhost:1200'
+  host: 'http://192.168.1.110:9200'
   username: 'elastic'
-  password: 'infini_rag_flow'
+  password: 'es000000'
 

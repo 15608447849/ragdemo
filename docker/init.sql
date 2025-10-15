@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `t_document` (
 
 CREATE TABLE IF NOT EXISTS `t_document_chunk` (
   `oid` bigint unsigned NOT NULL,
-  `doc_oid` bigint NOT NULL COMMENT '文档ID',
+  `doc_oid` bigint unsigned NOT NULL COMMENT '文档ID',
   `chunk_index` int NOT NULL COMMENT '分片序号',
   `chunk_content` text COLLATE utf8mb4_bin NOT NULL COMMENT '分片内容',
   `content_hash` varchar(64) COLLATE utf8mb4_bin NOT NULL COMMENT '内容MD5',

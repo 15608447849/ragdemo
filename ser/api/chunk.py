@@ -92,6 +92,7 @@ def do_chunk_pdf(doc_name,file_path,):
     # md文件分片
     splitter = SmartMarkdownSplitter(512, 10)
     chunks = splitter.split_markdown_document(mdfs)
+    logging.info(f"生成切片数量：{len(chunks)} 图片数量：{len(image_url_list)}') ")
     return chunks , image_url_list
 
 
@@ -135,7 +136,7 @@ def sava_elasticsearch_index(chunks_dbs):
         content = b['chunk_content']
         embedding = embed([content])[0].tolist()
         questions = llm_create_questions(content)
-        logging.info(f"chunk={content}\n{questions}")
+        # logging.info(f"chunk={content}\n{questions}")
         es_doc = {
             "_index": index_name,
             "_id": b['vector_id'],
@@ -169,9 +170,13 @@ def update_chunk_state(document_oid, chunk_count,chunk_status):
     with get_pool_conn() as db:
         t_document = db['t_document']
         updated = t_document.update(
-            chunk_count=chunk_count,
-            chunk_status=chunk_status,
-            where={'oid': document_oid}
+            {
+                'oid': document_oid,
+                'chunk_count': chunk_count,
+                'chunk_status': chunk_status,
+
+            },
+            keys=['oid']
         )
         logging.info(f'更新文档分片状态: document_oid={document_oid},'
                      f' chunk_count={chunk_count},'

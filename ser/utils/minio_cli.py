@@ -185,11 +185,11 @@ class MinIOClient:
          获取文件的公共访问 URL 前缀
         """
         minio_config = get_config('minio', {})
-        endpoint = minio_config.get('endpoint', 'localhost:9000')
+        host = minio_config.get('host', 'localhost:9000')
         secure = minio_config.get('secure', False)
 
         protocol = "https" if secure else "http"
-        public_url = f"{protocol}://{endpoint}/{self.bucket_name}"
+        public_url = f"{protocol}://{host}/{self.bucket_name}"
         return public_url
 
     def get_public_url(self, object_name: str) -> str:
@@ -197,11 +197,11 @@ class MinIOClient:
         获取文件的公共访问 URL（永久有效）
         """
         minio_config = get_config('minio', {})
-        endpoint = minio_config.get('endpoint', 'localhost:9000')
+        host = minio_config.get('host', 'localhost:9000')
         secure = minio_config.get('secure', False)
 
         protocol = "https" if secure else "http"
-        public_url = f"{protocol}://{endpoint}/{self.bucket_name}/{object_name}"
+        public_url = f"{protocol}://{host}/{self.bucket_name}/{object_name}"
         return public_url
 
 

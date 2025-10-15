@@ -1,9 +1,19 @@
 # 个人学习rag技术demo 
+es-混合 全文索引+向量索引  
+redis-keyval 历史记录  
+mysql 基础字段支持  
+minio 文件存储  
+显卡: NVIDIA GeForce RTX 4060ti 16g  
+本地模型:  Qwen3-4B-Instruct-2507 --可根据配置自行下载使用其他小模型  
+文本嵌入:  bge-small-zh-v1.5  
+pdf解析:  mineru  
+
 ## 示例
-![上传](./images/1.jpg "上传资料")  
-![文档](./images/2.jpg "管理文档,文档分片")  
-![回复](./images/3.jpg "回复")  
-![回复](./images/4.jpg "回复")  
+![上传](./images/1.png "上传资料")  
+![文档](./images/2.png "管理文档,文档分片")  
+![回复](./images/3.png "回复")  
+![回复](./images/4.png "回复")  
+![历史](./images/5.png "历史对话")  
 
 # 环境部署 bash
 `conda create -n ragdemo python==3.12 -y`  
@@ -28,6 +38,8 @@
 # 启动基础服务
 `cd docker`  
 `docker compose -f docker-compose-base.yml up -d`
+
+
 
 
 

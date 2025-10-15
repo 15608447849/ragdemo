@@ -11,6 +11,9 @@ from ser.utils.redis_cli import redis_client
 
 router = APIRouter()
 
+# 历史记录条数
+history_chat_limit = 20
+
 index_name = 'rag_demo_es_document_index'
 
 
@@ -44,7 +47,7 @@ class ChatSendRequest(BaseModel):
     message: str
 
 
-def query_elasticsearch(query_text,top_k=20):
+def query_elasticsearch(query_text,top_k=20, min_score=6):
     '''混合搜索：结合全文检索和向量相似度'''
 
     query_vector = embed([query_text])[0].tolist()
@@ -74,16 +77,18 @@ def query_elasticsearch(query_text,top_k=20):
                 ]
             }
         },
-        "size": top_k
+        "size": top_k,
+        "min_score": min_score
     }
     content_str = ''
     es_result = es_client.search(index=index_name, query=es_query)
     for i, hit in enumerate(es_result['hits']['hits']):
-        logging.info(f"结果 {i + 1}:")
-        logging.info(f"  ID: {hit['_id']}")
-        logging.info(f"  分数: {hit['_score']}")
+        logging.info(f"结果 {i + 1}  ID: {hit['_id']} 分数: {hit['_score']}")
         logging.info(f"  内容预览: {hit['_source']['content'][:100]}...")
-        content_str += hit['_source']['content'] + '\n'
+        if hit['_score'] >= min_score:
+            content_str += hit['_source']['content'] + '\n'
+        else:
+            logging.info("pass..")
     # 重排序-暂不实现
     return content_str
 
@@ -100,14 +105,14 @@ async def send_chat_message(request: ChatSendRequest):
     content_str = query_elasticsearch( question )
     # 获取历史
     chat_his_list = redis_client.get_list(f"chat_history:{user_identifier}")
-
+    logging.info(f"历史记录条数: {len(chat_his_list)}")
     # 构建提示词
     sys_prom= prompt.format(document_chunk=content_str, question=question)
 
     # 构建数据体
     messages = [{"role": "system", "content": sys_prom, "timestamp": get_current_time()}]
-    limit = 20
-    chat_his_msg = chat_his_list[-limit:] if len(chat_his_list) > limit else chat_his_list
+
+    chat_his_msg = chat_his_list[-history_chat_limit:] if len(chat_his_list) > history_chat_limit else chat_his_list
     messages.extend(chat_his_msg)
     et = time.time()
 
@@ -117,7 +122,7 @@ async def send_chat_message(request: ChatSendRequest):
     chat_his_msg.append({"role": "assistant", "content": answer, 'timestamp': get_current_time()})
 
     # 存入redis覆盖历史记录
-    redis_client.set_list(f"chat_history:test", chat_his_msg)
+    redis_client.set_list(f"chat_history:{user_identifier}", chat_his_msg)
     response_time =  round((et - st) * 1000)
 
     # 构建响应
